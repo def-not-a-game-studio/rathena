@@ -1,5 +1,7 @@
 name: Publish docs via GitHub Pages
 on:
+  workflow_dispatch:
+  
   push:
     branches:
       - master
@@ -12,13 +14,25 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v2
 
-      - name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        # Or use mhausenblas/mkdocs-deploy-gh-pages@nomaterial to build without the mkdocs-material theme
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: docs
-          CONFIG_FILE: mkdocs.yml
-          EXTRA_PACKAGES: build-base
-          # GITHUB_DOMAIN: github.myenterprise.com
-          # REQUIREMENTS: folder/requirements.txt
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          cd ~
+          python -m pip install --upgrade pip
+          pip install mkdocs
+
+      - name: Clone our GH-Pages repository
+        run: |
+          git clone https://github.com/def-not-a-game-studio/docs ~/gh-pages
+
+      - name: Build documentation
+        run: |
+          ./mkdocs/mkdocs build --clean --strict --site-dir ~/rathena/doc
+
+      - name: Deploy
+        run: |
+          cd ~/gh-pages
+          git add . & git commit -m "${{ github.event.head_commit.message }}" & git push origin main
+          
