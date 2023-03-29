@@ -11,39 +11,15 @@ jobs:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v2
-
-      - uses: actions/setup-python@v2
+      - name: Deploy Stage
+        uses: actions/github-script@v5
         with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: |
-          cd ~
-          python -m pip install --upgrade pip
-          pip install mkdocs
-
-      - name: Clone our GH-Pages repository
-        run: |
-          git clone https://github.com/def-not-a-game-studio/docs ~/gh-pages
-
-      - name: Build documentation
-        run: |
-          ls
-          mkdocs build --clean --strict --site-dir ~/gh-pages
-
-      - name: Deploy
-        run: |
-          cd ~/gh-pages
-          # workaround, see https://github.com/actions/checkout/issues/766
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-          if ! git config --get user.name; then
-              git config --global user.name "${GITHUB_ACTOR}"
-          fi
-
-          if ! git config --get user.email; then
-              git config --global user.email "${GITHUB_ACTOR}@users.noreply.${GITHUB_DOMAIN:-"github.com"}"
-          fi
-          git add . & git commit -m "${{ github.event.head_commit.message }}" & git push origin main
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'def-not-a-game-studio',
+              repo: 'docs',
+              workflow_id: 'main.yml',
+              ref: 'main'
+            });
           
