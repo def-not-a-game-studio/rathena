@@ -29,7 +29,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          mkdocs build --clean --strict --site-dir ~/rathena/doc
+          mkdocs -d ~/gh-pages build --clean --strict --site-dir ~/rathena/doc
 
       - name: Deploy
         run: |
