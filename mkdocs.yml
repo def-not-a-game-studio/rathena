@@ -6,7 +6,7 @@ site_author: rAthena Developement Team
 copyright: rAthena
 #remote_branch: gh-pages
 #remote_name: origin
-site_favicon: logo.png
+#site_favicon: logo.png not working
 docs_dir: doc
 nav:
     - Home: index.md
